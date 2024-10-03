@@ -1,0 +1,2 @@
+Riichi Mahjong tiles by FluffyStuff is licensed under CC0.
+Original repository is https://github.com/FluffyStuff/riichi-mahjong-tiles.

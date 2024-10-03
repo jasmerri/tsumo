@@ -1,0 +1,11 @@
+[package]
+name = "mahjong"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = [ "Jasmine Erringer <https://github.com/jasmerri>" ]
+license = "MIT"
+repository = "https://github.com/jasmerri/mahjong-typst"
+description = "A library to generate displays of Mahjong tiles."
+categories = [ "components", "fun" ]
+keywords = [ "riichi", "mahjong" ]
+exclude = [ "manual.typ", "manual.pdf" ]
