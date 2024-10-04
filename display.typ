@@ -5,7 +5,8 @@
 
 #let style = (
   height: 4em,
-  padding: 4pt
+  padding: 4pt,
+  indicator-offset: 1pt
 )
 
 #let drawer(x, y, spec, style: style, resolver: none, name: none) = {
@@ -41,13 +42,19 @@
     for i in array.range(stack) {
       group(ctx => {
         let offset = i * if rotated {size.width} else {size.height}
-        let anchor = if rotated {"north-west"} else {"south-west"}
+        translate((x, y, 0))
+        translate((0, offset, 0))
+        if rotated {
+          rotate(90deg)
+          translate((0, -size.height, 0))
+        }
+        let anchor = "south-west"
         let angle = if rotated {90deg} else {0deg}
         if backdrop != none {
-          content((x, y + offset), backdrop, anchor: anchor, angle: angle)
+          content((0, 0), backdrop, anchor: anchor, angle: angle)
         }
         if image != none {
-          content((x + style.padding, y + offset + (size.height - img-size.height) / 2), image, anchor: anchor, angle: angle)
+          content((style.padding, (size.height - img-size.height) / 2), image, anchor: anchor, angle: angle)
         }
       })
     }
