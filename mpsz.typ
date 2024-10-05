@@ -1,64 +1,63 @@
-#import "./tile.typ": tiles, types, variants
+#import "./tile.typ": ids, types, variants
 
-#let digits = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
-#let specials = ("X", "-", "?")
-#let suits = ("m", "p", "s", "z")
-#let ignored = (" ")
+#let _ignored = (" ")
 
-#let z = (
-  "1": (which: tiles.wind.east, type: types.wind),
-  "2": (which: tiles.wind.south, type: types.wind),
-  "3": (which: tiles.wind.west, type: types.wind),
-  "4": (which: tiles.wind.north, type: types.wind),
-  "5": (which: tiles.dragon.white, type: types.dragon),
-  "6": (which: tiles.dragon.green, type: types.dragon),
-  "7": (which: tiles.dragon.red, type: types.dragon),
+#let _z = (
+  "1": (which: ids.wind.east, type: types.wind),
+  "2": (which: ids.wind.south, type: types.wind),
+  "3": (which: ids.wind.west, type: types.wind),
+  "4": (which: ids.wind.north, type: types.wind),
+  "5": (which: ids.dragon.white, type: types.dragon),
+  "6": (which: ids.dragon.green, type: types.dragon),
+  "7": (which: ids.dragon.red, type: types.dragon),
 )
 
-#let special = (
-  "X": tiles.other.back,
-  "-": tiles.other.nothing,
-  "?": tiles.other.question,
+#let _specials = (
+  "X": ids.other.back,
+  "-": ids.other.nothing,
+  "?": ids.other.question,
 )
 
-#let suit = (
+#let _suits = (
   "m": types.character,
   "p": types.dot,
   "s": types.bamboo,
+  "z": types.other,
 )
 
-#let numbers = (
-  "1": (which: tiles.suit.one, variant: none),
-  "2": (which: tiles.suit.two, variant: none),
-  "3": (which: tiles.suit.three, variant: none),
-  "4": (which: tiles.suit.four, variant: none),
-  "5": (which: tiles.suit.five, variant: none),
-  "6": (which: tiles.suit.six, variant: none),
-  "7": (which: tiles.suit.seven, variant: none),
-  "8": (which: tiles.suit.eight, variant: none),
-  "9": (which: tiles.suit.nine, variant: none),
-  "0": (which: tiles.suit.five, variant: variants.akadora),
+#let _numbers = (
+  "1": (which: ids.numbered.one,   variant: none),
+  "2": (which: ids.numbered.two,   variant: none),
+  "3": (which: ids.numbered.three, variant: none),
+  "4": (which: ids.numbered.four,  variant: none),
+  "5": (which: ids.numbered.five,  variant: none),
+  "6": (which: ids.numbered.six,   variant: none),
+  "7": (which: ids.numbered.seven, variant: none),
+  "8": (which: ids.numbered.eight, variant: none),
+  "9": (which: ids.numbered.nine,  variant: none),
+  "0": (which: ids.numbered.five,  variant: variants.akadora),
 )
 
-#let generate-spec(state, symbol) = {
+#let _generate-spec(state, symbol) = {
   let which = none
   let type = none
   let variant = none
-  if specials.contains(state.char) {
-    which = special.at(state.char)
+
+  if state.char in _specials {
+    which = _specials.at(state.char)
     type = types.other
   } else if(symbol != none) {
     if symbol == "z" {
-      let item = z.at(state.char, default: none)
+      let item = _z.at(state.char, default: none)
       if item == none {
         panic("invalid tile in mpsz string: " + state.char + "z")
       }
       which = item.which
       type = item.type
     } else {
-      let item = numbers.at(state.char)
+      let item = _numbers.at(state.char)
       which = item.which
-      type = suit.at(symbol)
+      type = _suits.at(symbol)
       variant = item.variant
     }
   } else {
@@ -79,18 +78,26 @@
   )
 }
 
+// Parse an mpsz string and return an array of tile specs.
 #let parse-mpsz(str) = {
   let tiles = ()
   let queued = ()
 
   for c in str {
-    if digits.contains(c) or specials.contains(c) {
+    if c in _numbers or c in _specials {
+      // Add a new character.
+
       let new = (char: c)
       queued.push(new)
-    } else if suits.contains(c) {
-      tiles += queued.map((q) => generate-spec(q, c))
+    } else if c in _suits {
+      // Fill in the suit of all previous characters.
+
+      tiles += queued.map((q) => _generate-spec(q, c))
       queued = ()
     } else if c == "'" or c == "\"" {
+      // Rotate previous tile.
+      // Unlike LaTeX's mahjong package, this doesn't support being after a suit (1m' instead of 1'm).
+
       if queued.len() <= 0 {
         panic("mpsz: trying to rotate nonexistent tile")
       }
@@ -101,13 +108,14 @@
       }
       queued.at(-1) = previous
     } else if ignored.contains(c) {
-      // do nothing
+      // Do nothing.
     } else {
       panic("invalid character in mpsz string: " + c)
     }
   }
 
-  tiles += queued.map((q) => generate-spec(q, none))
+  // Handle remaining tiles with no suit specified.
+  tiles += queued.map((q) => _generate-spec(q, none))
   queued = ()
 
   return tiles

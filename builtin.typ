@@ -1,6 +1,6 @@
-#import "./tile.typ": tiles, types, variants
+#import "./tile.typ": ids, tiles, types, variants
 
-#let prefixes = (
+#let _prefixes = (
   types.character: "Man",
   types.bamboo: "Sou",
   types.dot: "Pin",
@@ -9,86 +9,98 @@
   types.other: "",
 )
 
-#let suit-names = (
-  tiles.suit.one: "1",
-  tiles.suit.two: "2",
-  tiles.suit.three: "3",
-  tiles.suit.four: "4",
-  tiles.suit.five: "5",
-  tiles.suit.six: "6",
-  tiles.suit.seven: "7",
-  tiles.suit.eight: "8",
-  tiles.suit.nine: "9",
+#let _suit-names = (
+  ids.numbered.one: "1",
+  ids.numbered.two: "2",
+  ids.numbered.three: "3",
+  ids.numbered.four: "4",
+  ids.numbered.five: "5",
+  ids.numbered.six: "6",
+  ids.numbered.seven: "7",
+  ids.numbered.eight: "8",
+  ids.numbered.nine: "9",
 )
 
-#let dragon-names = (
-  tiles.dragon.white: "Haku",
-  tiles.dragon.green: "Hatsu",
-  tiles.dragon.red: "Chun",
+#let _dragon-names = (
+  ids.dragon.white: "Haku",
+  ids.dragon.green: "Hatsu",
+  ids.dragon.red: "Chun",
 )
 
-#let wind-names = (
-  tiles.wind.east: "Ton",
-  tiles.wind.south: "Nan",
-  tiles.wind.west: "Shaa",
-  tiles.wind.north: "Pei",
+#let _wind-names = (
+  ids.wind.east: "Ton",
+  ids.wind.south: "Nan",
+  ids.wind.west: "Shaa",
+  ids.wind.north: "Pei",
 )
 
-#let other-names = (
-  tiles.other.back: "Back",
-  tiles.other.question: "Blank",
+#let _other-names = (
+  ids.other.back: "Back",
+  ids.other.question: "Blank",
+  ids.other.blank: "Front",
 )
 
-#let names = (
-  types.character: suit-names,
-  types.bamboo: suit-names,
-  types.dot: suit-names,
-  types.dragon: dragon-names,
-  types.wind: wind-names,
-  types.other: other-names,
+#let _names = (
+  types.character: _suit-names,
+  types.bamboo: _suit-names,
+  types.dot: _suit-names,
+  types.dragon: _dragon-names,
+  types.wind: _wind-names,
+  types.other: _other-names,
 )
 
-#let variant-names = (
+#let _variant-names = (
   variants.akadora: "Dora",
 )
 
-#let base = "./assets/Tiles/Riichi/"
+#let _base = "./assets/Tiles/Riichi/"
 
-#let resolve-image-path(tile, ..args) = {
-  let path = base
+#let _resolve-image-path(tile, ..args) = {
+  let path = _base
 
-  if tile.type == types.other and tile.which == tiles.other.nothing {
+  if tile == tiles.other.nothing {
     return none
   }
   
-  if tile.type not in prefixes {
+  if tile.type not in _prefixes {
     panic("invalid riichi tile type: " + tile.type)
   }
-  path += prefixes.at(tile.type)
+  path += _prefixes.at(tile.type)
 
-  let n = names.at(tile.type)
+  let n = _names.at(tile.type)
   if tile.which not in n {
-    panic("invalid riichi tile: " + tile.which)
+    panic("invalid riichi tile: " + tile.type + "/" + tile.which + "/" + tile.variant)
   }
   path += n.at(tile.which)
   
   if tile.variant != none {
-    if tile.variant not in variant-names {
+    if tile.variant not in _variant-names {
       panic("invalid riichi tile variant: " + tile.variant)
     }
     if tile.variant == variants.akadora and (
       (tile.type != types.character and tile.type != types.bamboo and tile.type != types.dot)
-      or tile.which != tiles.suit.five
+      or tile.which != ids.numbered.five
     ) {
       panic("invalid riichi tile for akadora: " + tile.which)
     }
-    path += "-" + variant-names.at(tile.variant)
+    path += "-" + _variant-names.at(tile.variant)
   }
   image(path + ".svg", ..args)
 }
 
+// The default resolver. Uses Riichi tiles from ./assets/Tiles/Riichi.
 #let resolver = (
-  resolve-tile: resolve-image-path,
-  front: (..args) => image(base + "Front.svg", ..args),
-  back: (..args) => image(base + "Back.svg", ..args),
+  // Return an image from a tile tuple.
+  // The default drawer assumes this exists.
+  resolve-tile: _resolve-image-path,
+
+  // Image for the background of a face-up tile.
+  // Note that this is used for calculation of tile sizes.
+  // If your set of tiles doesn't have a background, this function should return blank content of the correct size.
+  // The default drawer assumes this exists.
+  front: (..args) => image(_base + "Front.svg", ..args),
+
+  // Image for the background of a face-down tile.
+  // The default drawer assumes this exists.
+  back: (..args) => image(_base + "Back.svg", ..args),
 )
