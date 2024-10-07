@@ -88,8 +88,8 @@
   image(path + ".svg", ..args)
 }
 
-// The default resolver. Uses Riichi tiles from ./assets/Tiles/Riichi.
-#let resolver = (
+// The default image resolver. Uses Riichi tiles from ./assets/Tiles/Riichi.
+#let riichi = (
   // Return an image from a tile tuple.
   // The default drawer assumes this exists.
   resolve-tile: _resolve-image-path,

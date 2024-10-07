@@ -1,5 +1,5 @@
 #import "@preview/cetz:0.2.2"
-#import "./builtin.typ": resolver
+#import "./image-sets.typ"
 #import "./mpsz.typ": parse-mpsz
 #import "./tile.typ": ids, tiles, types
 
@@ -15,26 +15,26 @@
 // Arguments:
 //   x, y: The position to draw the tile.
 //   style: The style given to the function by the user.
-//   resolver: The resolver given to resolve images.
+//   image-set: The image set given to resolve images for tiles.
 // Returns: a dictionary (
 //   element: The Cetz element drawing the tile.
 //   width: The width of the tile.
 // )
-#let drawer(x, y, spec, style: (:), resolver: none) = {
+#let drawer(x, y, spec, style: (:), image-set: image-sets.riichi) = {
   import cetz.draw: *
   let style = style + _style
 
-  let front = (resolver.front)(height: style.height)
+  let front = (image-set.front)(height: style.height)
   let size = measure(front)
 
   let backdrop = front
-  let image = (resolver.resolve-tile)(spec.tile, width: size.width - 2 * style.padding)
+  let image = (image-set.resolve-tile)(spec.tile, width: size.width - 2 * style.padding)
   
   if spec.tile == tiles.other.nothing {
     backdrop = none
     image = none
   } else if spec.tile == tiles.other.back {
-    backdrop = (resolver.back)(height: style.height)
+    backdrop = (image-set.back)(height: style.height)
     image = none
   }
 
@@ -80,19 +80,16 @@
 }
 
 // Given an array of tile specs, draw it onto a Cetz canvas.
-#let display(specs, style: (:), resolver: resolver, drawer: drawer) = {
+#let display(specs, style: (:), image-set: image-sets.riichi, drawer: drawer) = {
   context {
     cetz.canvas({
       import cetz.draw: *
       let a = 0pt
       for spec in specs {
-        let res = drawer(a, 0pt, spec, style: style, resolver: resolver)
+        let res = drawer(a, 0pt, spec, style: style, image-set: image-set)
         a += res.width
         res.element
       }
     })
   }
 }
-
-// A wrapper around display which parses the first argument as an mpsz string.
-#let mpsz(str, ..args) = display(parse-mpsz(str), ..args)
