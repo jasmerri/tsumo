@@ -1,7 +1,7 @@
 [package]
 name = "mahjong"
 version = "0.1.0"
-entrypoint = "lib.typ"
+entrypoint = "src/lib.typ"
 authors = [ "Jasmine Erringer <https://github.com/jasmerri>" ]
 license = "MIT"
 repository = "https://github.com/jasmerri/mahjong-typst"
