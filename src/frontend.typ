@@ -1,4 +1,7 @@
 #import "./display.typ": display
-#import "./mpsz.typ": parse-mpsz
+#import "./parser.typ"
 
-#let mahjong = (input, ..args, parser: parse-mpsz) => display(parser(input), ..args)
+#let mahjong(input, ..args, parser: parser.mpsz) = {
+  let parser = if parser == none { a => a } else { parser }
+  return display(parser(input), ..args)
+}

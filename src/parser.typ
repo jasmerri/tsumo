@@ -38,7 +38,7 @@
   "0": (which: ids.numbered.five,  variant: variants.akadora),
 )
 
-#let _generate-spec(state, symbol) = {
+#let _mpsz-generate-spec(state, symbol) = {
   let which = none
   let type = none
   let variant = none
@@ -79,7 +79,7 @@
 }
 
 // Parse an mpsz string and return an array of tile specs.
-#let parse-mpsz(str) = {
+#let mpsz(str) = {
   let tiles = ()
   let queued = ()
 
@@ -92,7 +92,7 @@
     } else if c in _suits {
       // Fill in the suit of all previous characters.
 
-      tiles += queued.map((q) => _generate-spec(q, c))
+      tiles += queued.map((q) => _mpsz-generate-spec(q, c))
       queued = ()
     } else if c == "'" or c == "\"" {
       // Rotate previous tile.
@@ -115,8 +115,11 @@
   }
 
   // Handle remaining tiles with no suit specified.
-  tiles += queued.map((q) => _generate-spec(q, none))
+  tiles += queued.map((q) => _mpsz-generate-spec(q, none))
   queued = ()
 
   return tiles
 }
+
+// Turn an array of tiles into an array of tile specs with no attributes.
+#let only-tiles(arr) = arr.map(v => (tile: v, attributes: (:)))

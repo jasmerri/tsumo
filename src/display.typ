@@ -1,6 +1,5 @@
 #import "@preview/cetz:0.2.2"
 #import "./image-sets.typ"
-#import "./mpsz.typ": parse-mpsz
 #import "./tile.typ": ids, tiles, types
 
 // Default style used by the default drawer.
