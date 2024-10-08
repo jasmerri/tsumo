@@ -1,11 +1,10 @@
 [package]
-name = "mahjong"
+name = "tsumo"
 version = "0.1.0"
 entrypoint = "src/lib.typ"
 authors = [ "Jasmine Erringer <https://github.com/jasmerri>" ]
 license = "MIT"
-repository = "https://github.com/jasmerri/mahjong-typst"
+repository = "https://github.com/jasmerri/tsumo"
 description = "A library to generate displays of Mahjong tiles."
 categories = [ "components", "fun" ]
 keywords = [ "riichi", "mahjong" ]
-exclude = [ "manual.typ", "manual.pdf" ]
