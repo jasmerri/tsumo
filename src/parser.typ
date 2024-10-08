@@ -107,7 +107,7 @@
         previous.stack = 2
       }
       queued.at(-1) = previous
-    } else if ignored.contains(c) {
+    } else if _ignored.contains(c) {
       // Do nothing.
     } else {
       panic("invalid character in mpsz string: " + c)
