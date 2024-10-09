@@ -84,11 +84,14 @@
     cetz.canvas({
       import cetz.draw: *
       let a = 0pt
+      let first = true
       for spec in specs {
+        if not first { a += style.spacing }
+        first = false
+        
         let res = drawer(a, 0pt, spec, style: style, image-set: image-set)
-        a += res.width
-        a += style.spacing
         res.element
+        a += res.width
       }
     })
   }
