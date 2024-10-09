@@ -6,7 +6,7 @@
 #let _style = (
   height: 4em,
   padding: 4pt,
-  indicator-offset: 1pt
+  spacing: 0pt
 )
 
 // The default drawer.
@@ -21,7 +21,6 @@
 // )
 #let drawer(x, y, spec, style: (:), image-set: image-sets.riichi) = {
   import cetz.draw: *
-  let style = style + _style
 
   let front = (image-set.front)(height: style.height)
   let size = measure(front)
@@ -80,6 +79,7 @@
 
 // Given an array of tile specs, draw it onto a Cetz canvas.
 #let display(specs, style: (:), image-set: image-sets.riichi, drawer: drawer) = {
+  let style = _style + style
   context {
     cetz.canvas({
       import cetz.draw: *
@@ -87,6 +87,7 @@
       for spec in specs {
         let res = drawer(a, 0pt, spec, style: style, image-set: image-set)
         a += res.width
+        a += style.spacing
         res.element
       }
     })
